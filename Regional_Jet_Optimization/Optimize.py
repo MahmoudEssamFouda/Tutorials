@@ -10,6 +10,10 @@
 import SUAVE
 from SUAVE.Core import Units, Data
 import numpy as np
+import os
+import sys
+current_directory_path = os.path.dirname(__file__)
+sys.path.append(current_directory_path)
 import Vehicles
 import Analyses
 import Missions
@@ -18,7 +22,7 @@ import Plot_Mission
 import matplotlib.pyplot as plt
 from SUAVE.Optimization import Nexus, carpet_plot
 import SUAVE.Optimization.Package_Setups.scipy_setup as scipy_setup
-
+sys.path.remove(current_directory_path)
 # ----------------------------------------------------------------------        
 #   Run the whole thing
 # ----------------------------------------------------------------------  
@@ -27,14 +31,15 @@ def main():
     problem = setup()
     
     ## Base Input Values
-    output = problem.objective()
+    # output = problem.objective()
     
     ## Uncomment to view contours of the design space
-    #variable_sweep(problem)
+    # variable_sweep(problem)
     
     # Uncomment for the first optimization
     output = scipy_setup.SciPy_Solve(problem,solver='SLSQP')
-    print (output)    
+    # print(output)
+    problem.translate(output)    
 
     print('fuel burn = ', problem.summary.base_mission_fuelburn)
     print('fuel margin = ', problem.all_constraints())
@@ -58,28 +63,47 @@ def setup():
     # -------------------------------------------------------------------
 
     #   [ tag                   , initial,     (lb , ub)        , scaling , units ]
+    # problem.inputs = np.array([
+    #     [ 'wing_area'           ,  92    , (   50. ,   130.   ) ,   100.  , Units.meter**2],
+    #     [ 'cruise_altitude'     ,   8    , (    6. ,    12.   ) ,   10.   , Units.km],
+    # ])
+
+    # problem.inputs = np.array([
+    #     [ 'wing_area'                    ,  95    ,    90. ,   130.    ,   100. , 1*Units.meter**2],
+    #     [ 'cruise_altitude'              ,  11    ,    9.  ,    14.    ,   10.  , 1*Units.km],
+    # ],dtype=object)
+
     problem.inputs = np.array([
-        [ 'wing_area'           ,  92    , (   50. ,   130.   ) ,   100.  , Units.meter**2],
-        [ 'cruise_altitude'     ,   8    , (    6. ,    12.   ) ,   10.   , Units.km],
-    ])
+        [ 'wing_area'                    ,  80    ,    50. ,   130.    ,   100. , 1*Units.meter**2],
+        [ 'cruise_altitude'              ,  8     ,    6.  ,    12.    ,   10.  , 1*Units.km],
+    ],dtype=object)
 
     # -------------------------------------------------------------------
     # Objective
     # -------------------------------------------------------------------
 
     # [ tag, scaling, units ]
+    # problem.objective = np.array([
+    #     [ 'fuel_burn', 10000, Units.kg ]
+    # ])
+
     problem.objective = np.array([
-        [ 'fuel_burn', 10000, Units.kg ]
-    ])
+        [ 'fuel_burn', 10000, 1*Units.kg ]
+    ],dtype=object)
+    
     
     # -------------------------------------------------------------------
     # Constraints
     # -------------------------------------------------------------------
     
     # [ tag, sense, edge, scaling, units ]
+    # problem.constraints = np.array([
+    #     [ 'design_range_fuel_margin' , '>', 0., 1E-1, Units.less], #fuel margin defined here as fuel 
+    # ])
+
     problem.constraints = np.array([
-        [ 'design_range_fuel_margin' , '>', 0., 1E-1, Units.less], #fuel margin defined here as fuel 
-    ])
+        [ 'design_range_fuel_margin' , '>', 0., 1E-1, 1*Units.less], #fuel margin defined here as fuel 
+    ],dtype=object)
     
     # -------------------------------------------------------------------
     #  Aliases
@@ -147,3 +171,4 @@ def variable_sweep(problem):
 
 if __name__ == '__main__':
     main()
+    plt.show()

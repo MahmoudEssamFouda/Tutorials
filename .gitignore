@@ -42,6 +42,8 @@ nosetests.xml
 
 # local directories
 /workspace
+.venv
+.vscode
 
 # latex
 *.aux

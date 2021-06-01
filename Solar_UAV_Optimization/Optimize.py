@@ -9,6 +9,10 @@
 
 from SUAVE.Core import Units, Data
 import numpy as np
+import os
+import sys
+current_directory_path = os.path.dirname(__file__)
+sys.path.append(current_directory_path)
 import Vehicles
 import Analyses
 import Missions
@@ -18,7 +22,7 @@ import SUAVE.Optimization.Package_Setups.scipy_setup as scipy_setup
 import SUAVE.Optimization.Package_Setups.pyopt_setup as pyopt_setup
 from SUAVE.Optimization.Nexus import Nexus
 import pylab as plt
-
+sys.path.remove(current_directory_path)
 
 # ----------------------------------------------------------------------        
 #   Run the whole thing
@@ -50,12 +54,12 @@ def setup():
 
     # [ tag , initial, [lb,ub], scaling, units ]
     problem.inputs = np.array([
-        [ 'wing_area'       ,    0.5, (  0.1,      1.5 ),    0.5, Units.meter      ],
-        [ 'aspect_ratio'    ,   10.0, (  5.0,     20.0 ),   10.0, Units.less       ], 
-        [ 'dynamic_pressure',  125.0, (  1.0,   2000.0 ),  125.0, Units.pascals    ], 
-        [ 'solar_ratio'     ,    0.0, (  0.0,      0.97),    1.0, Units.less       ], 
-        [ 'kv'              ,  800.0, ( 10.0,  10000.0 ),  800.0, Units['rpm/volt']], 
-    ])
+        [ 'wing_area'       ,    0.5,   0.1,      1.5 ,    0.5, 1*Units.meter      ],
+        [ 'aspect_ratio'    ,   10.0,   5.0,     20.0 ,   10.0, 1*Units.less       ], 
+        [ 'dynamic_pressure',  125.0,   1.0,   2000.0 ,  125.0, 1*Units.pascals    ], 
+        [ 'solar_ratio'     ,    0.0,   0.0,      0.97,    1.0, 1*Units.less       ], 
+        [ 'kv'              ,  800.0,  10.0,  10000.0 ,  800.0, 1*Units['rpm/volt']], 
+    ],dtype=object)
 
     # -------------------------------------------------------------------
     # Objective
@@ -63,8 +67,8 @@ def setup():
 
     # [ tag, scaling, units ]
     problem.objective = np.array([
-         [ 'Nothing', 1. , Units.kg],
-    ])
+         [ 'Nothing', 1. , 1*Units.kg],
+    ],dtype=object)
     
     # -------------------------------------------------------------------
     # Constraints
@@ -72,12 +76,12 @@ def setup():
 
     # [ tag, sense, edge, scaling, units ]
     problem.constraints = np.array([
-        [ 'energy_constraint', '=', 0.0, 1.0, Units.less],
-        [ 'battery_mass'     , '>', 0.0, 1.0, Units.kg  ],       
-        [ 'CL'               , '>', 0.0, 1.0, Units.less],
-        [ 'Throttle_min'     , '>', 0.0, 1.0, Units.less],
-        [ 'Throttle_max'     , '>', 0.0, 1.0, Units.less],
-    ])
+        [ 'energy_constraint', '=', 0.0, 1.0, 1*Units.less],
+        [ 'battery_mass'     , '>', 0.0, 1.0, 1*Units.kg  ],       
+        [ 'CL'               , '>', 0.0, 1.0, 1*Units.less],
+        [ 'Throttle_min'     , '>', 0.0, 1.0, 1*Units.less],
+        [ 'Throttle_max'     , '>', 0.0, 1.0, 1*Units.less],
+    ],dtype=object)
     
     # -------------------------------------------------------------------
     #  Aliases
